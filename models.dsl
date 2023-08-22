@@ -69,7 +69,6 @@ workspace {
         # Relationship between Components and Other Containers
         authService -> authSystem "Authorize user permissions" "JSON/HTTPS"
         bookService -> bookstoreDatabase "Read/Write data" "ODBC"
-        bookService -> bookstoreDatabase "Read/Write data" "ODBC"
         bookEventPublisher -> bookEventStream "Publish book update events"
     }
 
