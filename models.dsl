@@ -11,15 +11,15 @@ workspace {
         bookstoreSystem = softwareSystem "iBookstore System" "Allows users to view about book, and administrate the book details" "Target System" {
             # Level 2: Containers
             # <variable> = container <name> <description> <technology> <tag>
-            searchWebApi = container "Search Web API" "Allows only authorized users searching books records via HTTPS API" "Go"
-            adminWebApi = container "Admin Web API" "Allows only authorized users administering books details via HTTPS API" "Go" {
+            searchWebApi = container "Search API" "Allows only authorized users searching books records via HTTPS API" "Go"
+            adminWebApi = container "Admin Web API" "Allows only internal users to manage books and purchases information using HTTPs" "Go" {
                 # Level 3: Components
                 # <variable> = component <name> <description> <technology> <tag>
                 bookService = component "Book Service" "Allows administrating book details" "Go"
                 authService = component "Authorizer" "Authorize users by using external Authorization System" "Go"
                 bookEventPublisher = component "Book Events Publisher" "Publishes books-related events to Events Publisher" "Go"
             }
-            publicWebApi = container "Public Web API" "Allows public users getting books information" "Go"
+            publicWebApi = container "Public Web API" "Allows public users getting books information using HTTPS" "Go"
             searchDatabase = container "Search Database" "Stores searchable book information" "ElasticSearch" "Database"
             bookstoreDatabase = container "Bookstore Database" "Stores book details" "PostgreSQL" "Database"
             bookEventStream = container "Book Event Stream" "Handles book-related domain events" "Apache Kafka 3.0"
@@ -44,14 +44,14 @@ workspace {
         bookstoreSystem -> shippingServices "Handle the book delivery"
 
         # Relationship between Containers
-        publicUser -> publicWebApi "View book information" "JSON/HTTPS"
-        publicWebApi -> searchDatabase "Retrieve book search data" "ODBC"
+        publicUser -> publicWebApi "Search books information" "JSON/HTTPS"
+        publicWebApi -> searchDatabase "Retrieve book search and read/write  data" "ODBC"
         authorizedUser -> searchWebApi "Search book with more details" "JSON/HTTPS"
         searchWebApi -> authSystem "Authorize user" "JSON/HTTPS"
         searchWebApi -> searchDatabase "Retrieve book search data" "ODBC"
-        authorizedUser -> adminWebApi "Administrate books and their details" "JSON/HTTPS"
+        internalUser -> adminWebApi "Administrate books and their details" "JSON/HTTPS"
         adminWebApi -> authSystem "Authorize user" "JSON/HTTPS"
-        adminWebApi -> bookstoreDatabase "Reads/Write book detail data" "ODBC"
+        adminWebApi -> bookstoreDatabase "Reads/Write the data" "ODBC"
         adminWebApi -> bookEventStream "Publish book update events" {
             tags "Async Request"
         }
@@ -65,7 +65,6 @@ workspace {
         }
 
         # Relationship between Components
-        authorizedUser -> bookService "Administrate book details" "JSON/HTTPS"
         publisherRecurrentUpdater -> bookService "Makes API calls to" "JSON/HTTPS"
         bookService -> authService "Uses"
         bookService -> bookEventPublisher "Uses"
