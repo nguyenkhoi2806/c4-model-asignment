@@ -22,8 +22,8 @@ workspace {
             publicWebApi = container "Public Web API" "Allows public users getting books information using HTTPS" "Go"
             searchDatabase = container "Search Database" "Stores searchable book information" "ElasticSearch" "Database"
             bookstoreDatabase = container "Bookstore Database" "Stores book details" "PostgreSQL" "Database"
-            bookEventStream = container "Book Event Stream" "Handles book-related domain events" "Apache Kafka 3.0"
-            bookEventConsumer = container "Book Event Consumer" "Listening to domain events and write publisher to Search Database for updating" "Go"
+            bookEventStream = container "Book Event System" "Handles book-related domain events" "Apache Kafka 3.0"
+            bookEventConsumer = container "Book Event Consumer" "Handle book update events" "Go"
             publisherRecurrentUpdater = container "Publisher Recurrent Updater" "Listening to external events from Publisher System, and update book information" "Go"
         }
         
@@ -45,7 +45,7 @@ workspace {
 
         # Relationship between Containers
         publicUser -> publicWebApi "Search books information" "JSON/HTTPS"
-        publicWebApi -> searchDatabase "Retrieve book search and read/write  data" "ODBC"
+        publicWebApi -> bookstoreDatabase "Retrieve book search and read/write  data" "ODBC"
         authorizedUser -> searchWebApi "Search book with more details" "JSON/HTTPS"
         searchWebApi -> authSystem "Authorize user" "JSON/HTTPS"
         searchWebApi -> searchDatabase "Retrieve book search data" "ODBC"
@@ -56,8 +56,8 @@ workspace {
             tags "Async Request"
         }
         bookEventStream -> bookEventConsumer "Consume book update events"
-        bookEventConsumer -> searchDatabase "Write book search data" "ODBC"
-        publisherRecurrentUpdater -> adminWebApi "Makes API calls to" "JSON/HTTPS"
+        bookEventConsumer -> searchDatabase "Write and search data" "ODBC"
+        publisherRecurrentUpdater -> adminWebApi "Update the data changes" "JSON/HTTPS" "Use"
 
         # Relationship between Containers and External System
         publisherSystem -> publisherRecurrentUpdater "Consume book publication update events" {
@@ -73,7 +73,7 @@ workspace {
         # Relationship between Components and Other Containers
         authService -> authSystem "Authorize user permissions" "JSON/HTTPS"
         bookService -> bookstoreDatabase "Read/Write data" "ODBC"
-        bookEventPublisher -> bookEventStream "Publish book update events"
+        bookEventPublisher -> bookEventStream "Handle the book-published event"
     }
 
     views {
