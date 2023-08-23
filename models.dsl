@@ -68,6 +68,7 @@ workspace {
         publisherRecurrentUpdater -> bookService "Makes API calls to" "JSON/HTTPS"
         bookService -> authService "Uses"
         bookService -> bookEventPublisher "Uses"
+        internalUser -> authService "Uses"
 
         # Relationship between Components and Other Containers
         authService -> authSystem "Authorize user permissions" "JSON/HTTPS"
