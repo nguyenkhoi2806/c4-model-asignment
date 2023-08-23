@@ -4,6 +4,7 @@ workspace {
         # <variable> = person <name> <description> <tag>
         publicUser = person "Public User" "An anonymous user of the bookstore" "User"
         authorizedUser = person "Authorized User" "A registered user of the bookstore, with personal account" "User"
+        internalUser = person "Internal User" "An internal user of a bookstore system refers to an individual or group of individuals who work within the bookstore" "User"
 
         # Software Systems
         # <variable> = softwareSystem <name> <description> <tag>
@@ -27,17 +28,20 @@ workspace {
         }
         
         # External Software Systems
-        authSystem = softwareSystem "Authorization System" "The external Identiy Provider Platform" "External System"
+        authSystem = softwareSystem "Identity Provider System" "The external Identiy Provider Platform for authorization purposes" "External System"
         publisherSystem = softwareSystem "Publisher System" "The 3rd party system of publishers that gives details about books published by them" "External System"
-        
+        shippingServices = softwareSystem "Shipping Service" "The 3rd party system of Shipping Service to handle book delivery" "External System"
+
         # Relationship between People and Software Systems
         # <variable> -> <variable> <description> <protocol>
         publicUser -> bookstoreSystem "View book information"
         authorizedUser -> bookstoreSystem "Search book with more details, administrate books and their details"
+        internalUser -> bookstoreSystem "Manage inventory, manage customers, manage orders, view report"
         bookstoreSystem -> authSystem "Register new user, and authorize user access"
         publisherSystem -> bookstoreSystem "Publish events for new book publication, and book information updates" {
             tags "Async Request"
         }
+        bookstoreSystem -> shippingServices "Handle the book delivery"
 
         # Relationship between Containers
         publicUser -> publicWebApi "View book information" "JSON/HTTPS"
