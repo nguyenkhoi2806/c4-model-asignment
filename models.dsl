@@ -8,7 +8,7 @@ workspace {
 
         # Software Systems
         # <variable> = softwareSystem <name> <description> <tag>
-        bookstoreSystem = softwareSystem "iBookstore System" "Allows users to view about book, and administrate the book details" "Target System" {
+        bookstoreSystem = softwareSystem "Bookstore System" "Allows users to view about book, and administrate the book details" "Target System" {
             # Level 2: Containers
             # <variable> = container <name> <description> <technology> <tag>
             searchWebApi = container "Search API" "Allows only authorized users searching books records via HTTPS API" "Go"
