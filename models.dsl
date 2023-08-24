@@ -25,6 +25,8 @@ workspace {
             bookEventStream = container "Book Event System" "Handles book-related domain events" "Apache Kafka 3.0"
             bookEventConsumer = container "Book Event Consumer" "Handle book update events" "Go"
             publisherRecurrentUpdater = container "Publisher Recurrent Updater" "Listening to external events from Publisher System, and update book information" "Go"
+            frontStoreApplication = container "Front store application" "Provide all the bookstore functionalities" "JavaScript & ReactJS"
+            backOfficeApplication = container "Back-office Application" "Provide all the bookstore administration functionalities" "JavaScript & ReactJS"
         }
         
         # External Software Systems
@@ -34,9 +36,12 @@ workspace {
 
         # Relationship between People and Software Systems
         # <variable> -> <variable> <description> <protocol>
+        publicUser -> frontStoreApplication "Use all bookstore functionalities"
         publicUser -> bookstoreSystem "View book information"
+        authorizedUser -> frontStoreApplication "Use all bookstore functionalities"
         authorizedUser -> bookstoreSystem "Search book with more details, administrate books and their details"
         internalUser -> bookstoreSystem "Manage inventory, manage customers, manage orders, view report"
+        internalUser -> backOfficeApplication "Use all administration functionalities"
         bookstoreSystem -> authSystem "Register new user, and authorize user access"
         publisherSystem -> bookstoreSystem "Publish events for new book publication, and book information updates" {
             tags "Async Request"
@@ -44,11 +49,14 @@ workspace {
         bookstoreSystem -> shippingServices "Handle the book delivery"
 
         # Relationship between Containers
+        frontStoreApplication -> publicWebApi "Place order" "Interact"
         publicUser -> publicWebApi "Search books information" "JSON/HTTPS"
         publicWebApi -> bookstoreDatabase "Retrieve book search and read/write  data" "ODBC"
         authorizedUser -> searchWebApi "Search book with more details" "JSON/HTTPS"
+        frontStoreApplication -> searchWebApi "Search book" "Interact"
         searchWebApi -> authSystem "Authorize user" "JSON/HTTPS"
         searchWebApi -> searchDatabase "Retrieve book search data" "ODBC"
+        backOfficeApplication -> adminWebApi "administrate books and purchases" "Interact"
         internalUser -> adminWebApi "Administrate books and their details" "JSON/HTTPS"
         adminWebApi -> authSystem "Authorize user" "JSON/HTTPS"
         adminWebApi -> bookstoreDatabase "Reads/Write the data" "ODBC"
