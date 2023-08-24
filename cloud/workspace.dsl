@@ -87,10 +87,10 @@ workspace extends ../models.dsl {
 
     views {
         # deployment <software-system> <environment> <key> <description>
-        deployment bookstoreSystem prodEnvironment "Dep-001-PROD" "Cloud Architecture for Bookstore Platform using AWS Services" {
-            include *
-            autoLayout lr
-        }
+        #deployment bookstoreSystem prodEnvironment "Dep-001-PROD" "Cloud Architecture for Bookstore Platform using AWS Services" {
+        #    include *
+        #    autoLayout lr
+        #}
         # dynamic <container> <name> <description>
         dynamic deployWorkflow "Dynamic-001-WF" "Bookstore platform deployment workflow" {
             developer -> repository "Commit, and push changes"
