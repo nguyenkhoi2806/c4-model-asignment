@@ -5,14 +5,14 @@ workspace extends ../models.dsl {
             deploymentNode "AWS" {
                 tags "Amazon Web Services - Cloud"
 
-                route53 = infrastructureNode "Route 53" {
+                route53 = infrastructureNode "Amazon Route 53" {
                     tags "Amazon Web Services - Route 53"
                 }
+                
 
                 deploymentNode "ap-southeast-1" {
                     tags "Amazon Web Services - Region"
-
-
+                    
                     deploymentNode "prod-vpc" {
                         tags "Amazon Web Services - VPC"
 
@@ -22,37 +22,56 @@ workspace extends ../models.dsl {
 
                         deploymentNode "eks-cluster" {
                             tags "Amazon Web Services - Elastic Kubernetes Service"
-                        
-                            deploymentNode "ec2-a" {
-                                tags "Amazon Web Services - EC2 Instance"
 
-                                searchWebApiInstance = containerInstance searchWebApi
-                                publicWebApiInstance = containerInstance publicWebApi
-                                adminWebApiInstance = containerInstance adminWebApi
-                                publisherRecurrentUpdateInstance = containerInstance publisherRecurrentUpdater
-                                backofficeApplicationInstance = containerInstance backOfficeApplication
+
+                            deploymentNode "private-net-a" {
+                                deploymentNode "ec2-a" {
+                                    tags "Amazon Web Services - EC2 Instance"
+                                
+                                    searchWebApiInstance = containerInstance searchWebApi
+                                    publicWebApiInstance = containerInstance publicWebApi
+                                    adminWebApiInstance = containerInstance adminWebApi
+                                    backofficeApplicationInstance = containerInstance backOfficeApplication
+                                }
                             }
 
-                            deploymentNode "ec2-b" {
-                                tags "Amazon Web Services - EC2 Instance"
+                            deploymentNode "private-net-b" { 
+                                deploymentNode "ec2-b" {
+                                    tags "Amazon Web Services - EC2 Instance"
 
-                                containerInstance bookEventConsumer
-                                containerInstance bookEventStream
+                                    containerInstance bookEventConsumer
+                                    containerInstance bookEventStream
+                                }
                             }
                         }
 
-                        deploymentNode "Amazon Elasticsearch" {
-                            tags "Amazon Web Services - Elasticsearch Service"
+                        deploymentNode "private-net-b" { 
+                            deploymentNode "AWS Open Search" {
+                                tags "Amazon Web Services - Elasticsearch Service"
 
-                            containerInstance searchDatabase
-                        }
-
-                        deploymentNode "PostgreSQL RDS" {
-                            tags "Amazon Web Services - RDS"
-                            
-                            containerInstance bookstoreDatabase
+                                containerInstance searchDatabase
+                            }
+                            deploymentNode "PostgreSQL RDS" {
+                                tags "Amazon Web Services - RDS"
+                                
+                                containerInstance bookstoreDatabase
+                            }
                         }
                     }
+                    deploymentNode "Front-store Application" {
+                        tags "Amazon Web Services - Front-store Application"
+
+                        s3Bucket = infrastructureNode "S3" {
+                            tags "Amazon Web Services - S3"
+                        }
+
+                        cloudFrontDistribution = infrastructureNode "CloudFront Distribution" {
+                            tags "Amazon Web Services - CloudFront Distribution"
+                        }
+                    }
+
+                    appLoadBalancer -> s3Bucket "Serves static content"
+                    s3Bucket -> cloudFrontDistribution "forward the request"
                 }
             }
             route53 -> appLoadBalancer
@@ -86,11 +105,11 @@ workspace extends ../models.dsl {
     }
 
     views {
-        # deployment <software-system> <environment> <key> <description>
-        #deployment bookstoreSystem prodEnvironment "Dep-001-PROD" "Cloud Architecture for Bookstore Platform using AWS Services" {
-        #    include *
-        #    autoLayout lr
-        #}
+        #deployment <software-system> <environment> <key> <description>
+        deployment bookstoreSystem prodEnvironment "Dep-001-PROD" "Cloud Architecture for Bookstore Platform using AWS Services" {
+            include *
+            autoLayout lr
+        }
         # dynamic <container> <name> <description>
         dynamic deployWorkflow "Dynamic-001-WF" "Bookstore platform deployment workflow" {
             developer -> repository "Commit, and push changes"
