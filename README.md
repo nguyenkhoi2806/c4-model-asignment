@@ -7,7 +7,10 @@ docker run -it --rm -p 8080:8080 -v {YOUR_ROOT_WORKSPACE_DIR}:/usr/local/structu
 ```
 
 or
-`sh run.sh`
+
+```bash
+sh run.sh
+```
 
 The set contains these diagrams:
 
